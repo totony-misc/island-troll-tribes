@@ -1,0 +1,71 @@
+package Charge
+
+
+import AbilityObjEditing
+import Assets
+import ClosureEvents
+import ChatCommands
+import GameConfig
+import ClosureForGroups
+import ClosureTimers
+import ITTKnockback
+
+
+@configurable constant int ABILITY_ID = 'XCHG'
+@configurable constant string TOOLTIP_NORMAL = "Q - Charge"
+@configurable constant string TOOLTIP_NORMAL_EXT= "Charges towards target point"
+@configurable constant string ICON_PATH = Icons.bTNWarStomp
+@configurable constant real COOLDOWN = 35
+@configurable constant int MANACOST = 30
+@configurable constant real IMPACT_DAMAGE = 45
+@configurable constant real CAST_RANGE = 800
+
+@compiletime function createSpell()
+    new AbilityDefinitionRainofFire(ABILITY_ID)
+    ..setAnimationNames("spell")
+    ..setButtonPositionNormalX(1)
+    ..setButtonPositionNormalY(0)
+    ..setButtonPositionResearchX(1)
+    ..setButtonPositionResearchY(0)
+    ..setIconNormal(ICON_PATH)
+    ..setDamage(1, 0)
+    ..setDamagePerSecond(1, 0)
+    ..setCastRange(1, CAST_RANGE)
+    ..setNumberofShards(1, 0)
+    ..setNumberofWaves(1, 0)
+    ..setAreaofEffect(1, 50)
+    ..setBuffs(1, "")
+    ..setCastingTime(1, 0)
+    ..setCooldown(1, COOLDOWN)
+    ..setDurationHero(1, 0)
+    ..setDurationNormal(1, 0)
+    ..setEffects(1, "")
+    ..setManaCost(1, MANACOST)
+    ..setHotkeyNormal("Q")
+    ..setName("Charge")
+    ..setTooltipNormal(1, TOOLTIP_NORMAL)
+    ..setTooltipNormalExtended(1, TOOLTIP_NORMAL_EXT)
+
+function onCast()
+    unit caster = GetSpellAbilityUnit()
+    vec2 targetPos = vec2(GetSpellTargetX(), GetSpellTargetY())
+    ITTKnockback.add(caster, 750, caster.getPos().angleTo(targetPos), angle(90 * DEGTORAD))
+
+    doPeriodicallyTimed(0.05, 2) chargeLoop ->
+        var speed = ITTKnockback.getVel(caster).length()
+        if (speed > 1)
+            print(speed.toString())
+        else
+            chargeLoop.stop()
+
+init
+    registerSpellEffectEvent(ABILITY_ID, () -> onCast())
+
+    registerCommandAll("charge") (triggerPlayer, args) ->
+        if (gameConfig.isTestModeEnabled())
+            printTimedToPlayer("Added charge to any selected heroes", 5., triggerPlayer)
+            forUnitsSelected(triggerPlayer) u ->
+                if (u.isType(UNIT_TYPE_HERO))
+                    u.addAbility(ABILITY_ID)
+        else
+            printTimedToPlayer("Requires test mode!", 5., triggerPlayer)
