@@ -1,0 +1,144 @@
+package TripleSwing
+
+import BuffObjEditing
+import AbilityObjEditing
+import Assets
+import ClosureEvents
+import HashMap
+import TimerUtils
+import TimerExtensions
+import ChatCommands
+import GameConfig
+import ClosureForGroups
+
+
+@configurable constant int ABILITY_ID = 'XFPS'
+@configurable constant int AURA_ABILITY_ID = 'XFPD'
+@configurable constant string ABILITY_ICON = Icons.bTNUnholyFrenzy
+@configurable constant real CAST_TIME = 0.35
+@configurable constant real COOLDOWN = 3
+@configurable constant integer DURATION_ATTACKS = 3
+@configurable constant real DURATION_TIMER = 10
+@configurable constant int MANACOST = 10
+@configurable constant string TOOLTIP_NORMAL =  "T - Triple Swing"
+@configurable constant string TOOLTIP_NORMAL_EXT = "Increases attack speed massively for the next 3 attacks."
+@configurable constant string SPECIAL_EFFECT_HANDS = "Abilities\\Spells\\Orc\\TrollBerserk\\HeadhunterWEAPONSLeft.mdl"
+
+
+@compiletime function CreateBuff()
+    new BuffDefinition('XTSB', 'Buhf')
+    ..setTooltipNormal(1, "Triple Swing")
+    ..setTooltipNormal(1, "Attack speed massively increased.")
+    ..setArtTarget(1, "")
+
+@compiletime function CreateAura()
+    new AbilityDefinitionAuraEnduranceCreep('XTSA')
+    ..setArtTarget(SPECIAL_EFFECT_HANDS)
+    ..setTargetAttachmentPoint1("hand,right")
+    ..setTargetAttachmentPoint("hand,left")
+    ..setTargetAttachments(2)
+    ..setBuffs(1, "XTSB")
+    ..setAreaofEffect(1, 0)
+    ..setDurationHero(1, 1)
+    ..setDurationNormal(1, 1)
+    ..setTargetsAllowed(1, "self")
+    ..setName("Triple swing aura")
+    ..setTooltipNormal(1, "Triple swing")
+    ..setTooltipNormalExtended(1, "Triple swing effect aura")
+    ..setAttackSpeedIncrease(1, 4)
+    ..setMovementSpeedIncrease(1, 0)
+    ..setLevels(1)
+
+    
+@compiletime function createSpellbook()
+    new AbilityDefinitionSpellBook('XTSS')
+    ..setButtonPositionNormalX(0)
+    ..setButtonPositionNormalY(1)
+    ..setButtonPositionResearchX(0)
+    ..setButtonPositionResearchY(1)
+    ..setIconNormal("")
+    ..setIconResearch("")
+    ..setIconTurnOff("")
+    ..setHeroAbility(false)
+    ..setItemAbility(false)
+    ..setLevels(1)
+    ..presetBaseOrderID(lvl -> "spellbook")
+    ..setName("Triple Swing Attackspeed")
+    ..setTooltipLearn("")
+    ..setTooltipLearnExtended("")
+    ..presetMaximumSpells(lvl -> 1)
+    ..presetMinimumSpells(lvl -> 1)
+    ..presetSpellList(lvl -> "XTSB")
+    ..presetCooldown(lvl -> 0)
+    ..presetTooltipNormal(lvl -> "")
+    ..presetTooltipNormalExtended(lvl -> "")
+    ..presetSharedSpellCooldown(lvl -> false)
+
+    
+@compiletime function createSpell()
+    new AbilityDefinitionWindWalk(ABILITY_ID)
+    ..setArtCaster("")
+    ..setArtEffect("")
+    ..setArtTarget("")
+    ..setArtSpecial("")
+    ..setButtonPositionNormalX(0)
+    ..setButtonPositionNormalY(1)
+    ..setButtonPositionResearchX(0)
+    ..setButtonPositionResearchY(1)
+    ..setIconNormal(ABILITY_ICON)
+    ..setIconResearch(ABILITY_ICON)
+    ..setIconTurnOff(ABILITY_ICON)
+    ..setHeroAbility(false)
+    ..setItemAbility(false)
+    ..setLevels(1)
+    ..setHotkeyNormal("Q")
+    ..setName("Triple Swing")
+    ..setTooltipNormal(1, TOOLTIP_NORMAL)
+    ..setTooltipNormalExtended(1, TOOLTIP_NORMAL_EXT)
+    ..setCooldown(1, COOLDOWN)
+    ..setManaCost(1, MANACOST)
+    ..setAnimationNames("")
+    ..setDurationHero(1, 0.01)
+    ..setCastingTime(1, 0)
+    ..setDurationNormal(1, 0)
+    ..setEffectSound("")
+    ..setBuffs(1, "")
+
+let attacksLeftMap = new HashMap<unit, integer>()
+let removalTimers = new HashMap<unit, timer>()
+
+function onCast()
+    var caster = GetSpellAbilityUnit()
+    
+    //Put caster attack count into map
+    attacksLeftMap.put(caster, DURATION_ATTACKS)
+
+    //Reset existing timer
+    if removalTimers.has(caster)
+        removalTimers.getAndRemove(caster).release()
+    
+    //Add spellbook with aura
+    caster.addAbility('XTSS')
+    //Hide spellbook
+    caster.getOwner().setAbilityAvailable('XTSS', false)
+
+    //Create timer to remove buff after duration
+    let t = getTimer()
+    t.doAfter(DURATION_TIMER) ->
+        caster.removeAbility('XTSS')
+        removalTimers.remove(caster)
+    removalTimers.put(caster, t)
+
+
+
+
+init
+    registerSpellEffectEvent(ABILITY_ID, () -> onCast())
+    registerCommandAll("tripleswing") (triggerPlayer, args) ->
+        if (gameConfig.isTestModeEnabled())
+            printTimedToPlayer("Addd triple swing to any selected heroes", 5., triggerPlayer)
+            forUnitsSelected(triggerPlayer) u ->
+                if (u.isType(UNIT_TYPE_HERO))
+                    u.addAbility(ABILITY_ID)
+        else
+            printTimedToPlayer("Requires test mode!", 5., triggerPlayer)
