@@ -54,7 +54,7 @@ public class ITTKnockback
 	static var isAirborneThreshold = 5.
 
 	/** Below this speed, sliding units will stop. */
-	static var minimumSlideSpeed = 30.
+	static var minimumSlideSpeed = 40.
 
 	/** Above this speed, sliding units will spawn a dust effect. */
 	static var frictionFxThreshold = 45.

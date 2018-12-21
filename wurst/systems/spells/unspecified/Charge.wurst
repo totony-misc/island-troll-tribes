@@ -9,9 +9,12 @@ import GameConfig
 import ClosureForGroups
 import ClosureTimers
 import ITTKnockback
+import DummyCaster
+import Orders
 
 
 @configurable constant int ABILITY_ID = 'XCHG'
+@configurable constant int DUMMY_SLOW_ABILITY_ID = 'XCDS'
 @configurable constant string TOOLTIP_NORMAL = "Q - Charge"
 @configurable constant string TOOLTIP_NORMAL_EXT= "Charges towards target point"
 @configurable constant string ICON_PATH = Icons.bTNWarStomp
@@ -20,9 +23,23 @@ import ITTKnockback
 @configurable constant real IMPACT_DAMAGE = 45
 @configurable constant real CAST_RANGE = 800
 
+@compiletime function createSlowDummySpell()
+    new AbilityDefinitionSlowCreep(DUMMY_SLOW_ABILITY_ID)
+    ..setAttackSpeedFactor(1, 0)
+    ..setMovementSpeedFactor(1, 0.85)
+    ..setBuffs(1, "BHtc")
+    ..setCastRange(1, 1500)
+    ..setCastingTime(1, 0)
+    ..setCooldown(1, 0)
+    ..setDurationHero(1, 3)
+    ..setDurationNormal(1, 3)
+    ..setManaCost(1, 0)
+    ..setTargetsAllowed(1, "air,allies,enemies,ground")
+    ..setName("Dummy Slow")
+
 @compiletime function createSpell()
     new AbilityDefinitionRainofFire(ABILITY_ID)
-    ..setAnimationNames("spell")
+    ..setAnimationNames("")
     ..setButtonPositionNormalX(1)
     ..setButtonPositionNormalY(0)
     ..setButtonPositionResearchX(1)
@@ -49,14 +66,30 @@ import ITTKnockback
 function onCast()
     unit caster = GetSpellAbilityUnit()
     vec2 targetPos = vec2(GetSpellTargetX(), GetSpellTargetY())
-    ITTKnockback.add(caster, 750, caster.getPos().angleTo(targetPos), angle(90 * DEGTORAD))
+    player owner = caster.getOwner()
 
-    doPeriodicallyTimed(0.05, 2) chargeLoop ->
-        var speed = ITTKnockback.getVel(caster).length()
-        if (speed > 1)
-            print(speed.toString())
-        else
+    doPeriodicallyTimed(0.03125, 0.5) chargeLoop ->
+        var casterPos = caster.getPos()
+        forUnitsInRange(casterPos, 80) u ->
+            if u.isAlive() and not u.isInvulnerable() and u.getOwner().isEnemyOf(owner)
+                caster.damageTarget(u, 20)
+                var efx = addEffect("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl", caster.getPos())
+                efx.setScale(0.5)
+                efx.setTimeScale(1.5)
+                efx.destr()
+
+                if not IsUnitBoss(u)
+                    ITTKnockback.add(u, 700, caster.getPos().angleTo(u.getPos()), angle(90 * DEGTORAD))
+                    new DummyCaster().castTarget(owner, DUMMY_SLOW_ABILITY_ID, 1, Orders.slow, u, u.getPos())
+                chargeLoop.stop()
+
+        if (caster.getPos().distanceTo(targetPos) < 35)
             chargeLoop.stop()
+
+        if chargeLoop.isLast()
+            ITTKnockback.setVel(caster, 0, angle(0), angle(0))
+        else
+            ITTKnockback.setVel(caster, 1800, caster.getPos().angleTo(targetPos), angle(90 * DEGTORAD))
 
 init
     registerSpellEffectEvent(ABILITY_ID, () -> onCast())
