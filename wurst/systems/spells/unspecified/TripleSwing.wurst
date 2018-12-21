@@ -10,9 +10,10 @@ import TimerExtensions
 import ChatCommands
 import GameConfig
 import ClosureForGroups
+import DamageType
 
 
-@configurable constant int ABILITY_ID = 'XFPS'
+@configurable constant int ABILITY_ID = 'XFTS'
 @configurable constant int AURA_ABILITY_ID = 'XFPD'
 @configurable constant string ABILITY_ICON = Icons.bTNUnholyFrenzy
 @configurable constant real CAST_TIME = 0.35
@@ -20,8 +21,8 @@ import ClosureForGroups
 @configurable constant integer DURATION_ATTACKS = 3
 @configurable constant real DURATION_TIMER = 10
 @configurable constant int MANACOST = 10
-@configurable constant string TOOLTIP_NORMAL =  "T - Triple Swing"
-@configurable constant string TOOLTIP_NORMAL_EXT = "Increases attack speed massively for the next 3 attacks."
+@configurable constant string TOOLTIP_NORMAL =  "Q - Triple Swing"
+@configurable constant string TOOLTIP_NORMAL_EXT = "Increases attack speed massively for the next three attacks."
 @configurable constant string SPECIAL_EFFECT_HANDS = "Abilities\\Spells\\Orc\\TrollBerserk\\HeadhunterWEAPONSLeft.mdl"
 
 
@@ -45,7 +46,7 @@ import ClosureForGroups
     ..setName("Triple swing aura")
     ..setTooltipNormal(1, "Triple swing")
     ..setTooltipNormalExtended(1, "Triple swing effect aura")
-    ..setAttackSpeedIncrease(1, 4)
+    ..setAttackSpeedIncrease(1, 10)
     ..setMovementSpeedIncrease(1, 0)
     ..setLevels(1)
 
@@ -56,9 +57,9 @@ import ClosureForGroups
     ..setButtonPositionNormalY(1)
     ..setButtonPositionResearchX(0)
     ..setButtonPositionResearchY(1)
-    ..setIconNormal("")
-    ..setIconResearch("")
-    ..setIconTurnOff("")
+    ..setIconNormal(ABILITY_ICON)
+    ..setIconResearch(ABILITY_ICON)
+    ..setIconTurnOff(ABILITY_ICON)
     ..setHeroAbility(false)
     ..setItemAbility(false)
     ..setLevels(1)
@@ -68,7 +69,7 @@ import ClosureForGroups
     ..setTooltipLearnExtended("")
     ..presetMaximumSpells(lvl -> 1)
     ..presetMinimumSpells(lvl -> 1)
-    ..presetSpellList(lvl -> "XTSB")
+    ..presetSpellList(lvl -> "XTSA")
     ..presetCooldown(lvl -> 0)
     ..presetTooltipNormal(lvl -> "")
     ..presetTooltipNormalExtended(lvl -> "")
@@ -119,8 +120,13 @@ function onCast()
     
     //Add spellbook with aura
     caster.addAbility('XTSS')
+
     //Hide spellbook
     caster.getOwner().setAbilityAvailable('XTSS', false)
+
+    //Reset attack cd
+    caster.setAttackCooldown(0, 0)
+    caster.setAttackCooldown(1, 0)
 
     //Create timer to remove buff after duration
     let t = getTimer()
@@ -129,16 +135,30 @@ function onCast()
         removalTimers.remove(caster)
     removalTimers.put(caster, t)
 
-
+function onDamage(unit attacker)
+    if (attacksLeftMap.has(attacker))
+        integer attacksLeft = attacksLeftMap.get(attacker)
+        attacksLeft = attacksLeft - 1
+        if (attacksLeft == 0)
+            attacksLeftMap.remove(attacker)
+            attacker.removeAbility('XTSS')
+        else
+            attacksLeftMap.put(attacker, attacksLeft)
 
 
 init
     registerSpellEffectEvent(ABILITY_ID, () -> onCast())
     registerCommandAll("tripleswing") (triggerPlayer, args) ->
         if (gameConfig.isTestModeEnabled())
-            printTimedToPlayer("Addd triple swing to any selected heroes", 5., triggerPlayer)
+            printTimedToPlayer("Add triple swing to any selected heroes", 5., triggerPlayer)
             forUnitsSelected(triggerPlayer) u ->
                 if (u.isType(UNIT_TYPE_HERO))
                     u.addAbility(ABILITY_ID)
         else
             printTimedToPlayer("Requires test mode!", 5., triggerPlayer)
+
+    EventListener.add(EVENT_UNIT_DAMAGED) ->
+        var attacker = GetEventDamageSource()
+        var target = GetTriggerUnit()
+        if getDamageType() == DamageType.ATTACK
+            onDamage(attacker)
