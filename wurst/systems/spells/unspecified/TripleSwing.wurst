@@ -11,15 +11,15 @@ import ChatCommands
 import GameConfig
 import ClosureForGroups
 import DamageType
+import ClosureTimers
 
 
 @configurable constant int ABILITY_ID = 'XFTS'
 @configurable constant int AURA_ABILITY_ID = 'XFPD'
 @configurable constant string ABILITY_ICON = Icons.bTNUnholyFrenzy
-@configurable constant real CAST_TIME = 0.35
 @configurable constant real COOLDOWN = 3
 @configurable constant integer DURATION_ATTACKS = 3
-@configurable constant real DURATION_TIMER = 10
+@configurable constant real DURATION_TIMER = 4
 @configurable constant int MANACOST = 10
 @configurable constant string TOOLTIP_NORMAL =  "Q - Triple Swing"
 @configurable constant string TOOLTIP_NORMAL_EXT = "Increases attack speed massively for the next three attacks."
@@ -33,6 +33,7 @@ import DamageType
     ..setArtTarget(1, "")
 
 @compiletime function CreateAura()
+/*
     new AbilityDefinitionAuraEnduranceCreep('XTSA')
     ..setArtTarget(SPECIAL_EFFECT_HANDS)
     ..setTargetAttachmentPoint1("hand,right")
@@ -49,6 +50,24 @@ import DamageType
     ..setAttackSpeedIncrease(1, 10)
     ..setMovementSpeedIncrease(1, 0)
     ..setLevels(1)
+*/
+
+    new AbilityDefinitionAttackSpeedIncrease('XTSA')
+    ..setArtTarget(SPECIAL_EFFECT_HANDS)
+    ..setTargetAttachmentPoint1("hand,right")
+    ..setTargetAttachmentPoint("hand,left")
+    ..setTargetAttachments(2)
+    ..setBuffs(1, "XTSB")
+    ..setAreaofEffect(1, 0)
+    ..setDurationHero(1, 1)
+    ..setDurationNormal(1, 1)
+    ..setTargetsAllowed(1, "self")
+    ..setName("Triple swing aura")
+    ..setTooltipNormal(1, "Triple swing")
+    ..setTooltipNormalExtended(1, "Triple swing effect aura")
+    ..setAttackSpeedIncrease(1, 4)
+    ..setLevels(1)
+
 
     
 @compiletime function createSpellbook()
@@ -107,6 +126,7 @@ import DamageType
 
 let attacksLeftMap = new HashMap<unit, integer>()
 let removalTimers = new HashMap<unit, timer>()
+let attackCooldowns = new HashMap<unit, real>()
 
 function onCast()
     var caster = GetSpellAbilityUnit()
@@ -123,16 +143,19 @@ function onCast()
 
     //Hide spellbook
     caster.getOwner().setAbilityAvailable('XTSS', false)
+    caster.getAttackCooldown(1).toString()
 
-    //Reset attack cd
-    caster.setAttackCooldown(0, 0)
-    caster.setAttackCooldown(1, 0)
+    //Save attack cooldown
+    attackCooldowns.put(caster, caster.getAttackCooldown(1))
+    caster.setAttackCooldown(1.2, 1)
 
     //Create timer to remove buff after duration
     let t = getTimer()
     t.doAfter(DURATION_TIMER) ->
         caster.removeAbility('XTSS')
         removalTimers.remove(caster)
+        if attackCooldowns.has(caster)
+            caster.setAttackCooldown(attackCooldowns.getAndRemove(caster), 1)
     removalTimers.put(caster, t)
 
 function onDamage(unit attacker)
@@ -140,14 +163,29 @@ function onDamage(unit attacker)
         integer attacksLeft = attacksLeftMap.get(attacker)
         attacksLeft = attacksLeft - 1
         if (attacksLeft == 0)
-            attacksLeftMap.remove(attacker)
             attacker.removeAbility('XTSS')
+
+            //Remove timer
+            if removalTimers.has(attacker)
+                removalTimers.getAndRemove(attacker).release()
+
+            //Remove from attacks map
+            attacksLeftMap.remove(attacker)
+            
+            //Reset attack cooldown for unit
+            if attackCooldowns.has(attacker)
+                attacker.setAttackCooldown(attackCooldowns.getAndRemove(attacker), 1)
+            
+            doAfter(0.2) ->
+                SetUnitAnimationByIndex(attacker, 0)
+
         else
             attacksLeftMap.put(attacker, attacksLeft)
 
 
 init
     registerSpellEffectEvent(ABILITY_ID, () -> onCast())
+
     registerCommandAll("tripleswing") (triggerPlayer, args) ->
         if (gameConfig.isTestModeEnabled())
             printTimedToPlayer("Add triple swing to any selected heroes", 5., triggerPlayer)
