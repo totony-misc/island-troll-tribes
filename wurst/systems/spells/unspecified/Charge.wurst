@@ -68,13 +68,17 @@ function onCast()
     vec2 targetPos = vec2(GetSpellTargetX(), GetSpellTargetY())
     player owner = caster.getOwner()
 
+    caster.setAnimation("attack")
+    caster.pause()
     doPeriodicallyTimed(0.03125, 0.5) chargeLoop ->
         var casterPos = caster.getPos()
         forUnitsInRange(casterPos, 80) u ->
-            if u.isAlive() and not u.isInvulnerable() and u.getOwner().isEnemyOf(owner)
+            if u.isAlive() and not u.isInvulnerable() and u.getOwner().isEnemyOf(owner) and not u.isType(UNIT_TYPE_FLYING)
                 caster.damageTarget(u, 20)
-                var efx = addEffect("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl", caster.getPos())
-                efx.setScale(0.5)
+                vec2 fxpos = caster.getPos().polarOffset(caster.getPos().angleTo(u.getPos()), caster.getPos().distanceTo(u.getPos())/2)
+                var efx = addEffect("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl", fxpos.withTerrainZ(25))
+                
+                efx.setScale(0.65)
                 efx.setTimeScale(1.5)
                 efx.destr()
 
@@ -88,7 +92,9 @@ function onCast()
 
         if chargeLoop.isLast()
             ITTKnockback.setVel(caster, 0, angle(0), angle(0))
+            caster.unpause()
         else
+            caster.setFacing(caster.getPos().angleTo(targetPos))
             ITTKnockback.setVel(caster, 1800, caster.getPos().angleTo(targetPos), angle(90 * DEGTORAD))
 
 init
