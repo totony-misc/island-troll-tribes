@@ -17,12 +17,7 @@ if b != null then
         call UnitRemoveAbility( a, 'B00H' )
         call RemoveSavedHandle(udg_GameHash, GetHandleId(a), StringHash("fire"))
     else
-        if(GetUnitTypeId(a) == UNIT_HERB_MASTER) or (GetUnitTypeId(a) == UNIT_RADAR_GATHERER) then
-            set r = GetRandomReal(0, 100)
-        elseif GetUnitTypeId(a) == UNIT_OMNIGATHERER then
-            set r = GetRandomReal(0, 100)
-        endif
-
+        set r = GetRandomReal(0, 100)
         if(GetItemTypeId(i) == ITEM_BUTSU or GetItemTypeId(i) == ITEM_RIVER_ROOT or GetItemTypeId(i) == ITEM_RIVER_STEM or GetItemTypeId(i) == ITEM_BLUE_HERB or GetItemTypeId(i) == ITEM_ORANGE_HERB or GetItemTypeId(i) == ITEM_REFINED_POISON_SPEAR or GetItemTypeId(i) == ITEM_RIVER_ROOT) then
             if(GetUnitTypeId(a) == UNIT_HERB_MASTER or GetUnitTypeId(a) == UNIT_OMNIGATHERER) then
                 set q=100
