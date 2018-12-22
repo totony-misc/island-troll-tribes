@@ -24,19 +24,19 @@ import ClosureTimers
 @configurable constant int ABILITY_ID_FINDSTONE = 'XGFS'
 @configurable constant int ABILITY_ID_FINDMANA = 'XGFM'
 @configurable constant int ABILITY_ID_SPELLBOOK = 'XGRB'
-@configurable constant string TOOLTIP_NORM_FINDTINDER = "|c00ffcc00Q|r -  Find Tinder"
+@configurable constant string TOOLTIP_NORM_FINDTINDER = "|c00ffcc00Q|r - Find Tinder"
 @configurable constant string TOOLTIP_EXT_FINDTINDER = "Pings all nearby tinder in the minimap and reveals them for a short duration."
-@configurable constant string TOOLTIP_NORM_FINDSTICK = "|c00ffcc00W|r -  Find Stick"
+@configurable constant string TOOLTIP_NORM_FINDSTICK = "|c00ffcc00W|r - Find Stick"
 @configurable constant string TOOLTIP_EXT_FINDSTICK = "Pings all nearby sticks in the minimap and reveals them for a short duration."
-@configurable constant string TOOLTIP_NORM_FINDMUSHROOM = "|c00ffcc00E|r -  Find Mushroom"
+@configurable constant string TOOLTIP_NORM_FINDMUSHROOM = "|c00ffcc00E|r - Find Mushroom"
 @configurable constant string TOOLTIP_EXT_FINDMUSHROOM = "Pings all nearby mushrooms in the minimap and reveals them for a short duration."
-@configurable constant string TOOLTIP_NORM_FINDCLAYBALL = "|c00ffcc00R|r -  Find Clay Ball"
+@configurable constant string TOOLTIP_NORM_FINDCLAYBALL = "|c00ffcc00R|r - Find Clay Ball"
 @configurable constant string TOOLTIP_EXT_FINDCLAYBALL = "Pings all nearby clay balls in the minimap and reveals them for a short duration."
-@configurable constant string TOOLTIP_NORM_FINDFLINT = "|c00ffcc00A|r -  Find Flint"
+@configurable constant string TOOLTIP_NORM_FINDFLINT = "|c00ffcc00A|r - Find Flint"
 @configurable constant string TOOLTIP_EXT_FINDFLINT = "Pings all nearby flints in the minimap and reveals them for a short duration."
-@configurable constant string TOOLTIP_NORM_FINDSTONE = "|c00ffcc00S|r -  Find Stone"
+@configurable constant string TOOLTIP_NORM_FINDSTONE = "|c00ffcc00S|r - Find Stone"
 @configurable constant string TOOLTIP_EXT_FINDSTONE = "Pings all nearby stones in the minimap and reveals them for a short duration."
-@configurable constant string TOOLTIP_NORM_FINDMANA = "|c00ffcc00D|r -  Find Mana Crystals"
+@configurable constant string TOOLTIP_NORM_FINDMANA = "|c00ffcc00D|r - Find Mana Crystals"
 @configurable constant string TOOLTIP_EXT_FINDMANA = "Pings all nearby mana crystals in the minimap and reveals them for a short duration."
 
 @compiletime function CreateFindStone()
@@ -284,7 +284,7 @@ import ClosureTimers
     ..presetMaximumSpells(lvl -> 11)
     ..presetMinimumSpells(lvl -> 11)
     ..presetSpellList(lvl -> SPELLBOOKSPELLS[lvl - 1])
-    ..presetCooldown(lvl -> 0)
+    ..presetCooldown(lvl -> COOLDOWN)
     ..presetTooltipNormal(lvl -> "(|cffffcc00Q|r) - Look up radar spell ")
     ..presetTooltipNormalExtended(lvl -> "Contains various item radar abilities for more efficient gathering.")
     ..presetSharedSpellCooldown(lvl -> true)
