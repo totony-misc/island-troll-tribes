@@ -254,6 +254,7 @@ function onCast()
         if i.getPos().distanceTo(casterPos) < RADAR_RANGE and i.getTypeId() == itemId
             //Vision
             var vis = createVision(owner, i.getPos(), 300, true)
+            vis.start()
             doAfter(REVEAL_DURATION) ->
                 vis.destr()
 
