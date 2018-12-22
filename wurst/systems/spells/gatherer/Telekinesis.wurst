@@ -1,0 +1,24 @@
+package Telekinesis
+
+import InventoryEvent
+import ClosureEvents
+
+init
+    EventListener.add(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER) ->
+        item targetItem = GetOrderTargetItem()
+        unit ordered = GetOrderedUnit()
+        print(targetItem.getName() + " targeted by " + ordered.getName())
+
+        if (ordered.inventorySize() - ordered.itemCount() > 0)
+            ordered.addItemHandle(targetItem)
+            ordered.issueImmediateOrder("stop")
+
+    EventListener.add(EVENT_PLAYER_UNIT_DROP_ITEM) ->
+        item targetItem = GetOrderTargetItem()
+        unit ordered = GetOrderedUnit()
+        
+        print(getInventoryManipulatedItem().getName() + " from slot " + getInventorySlotFrom().toString() + " drop order by " + ordered.getName())
+
+        if (ordered.inventorySize() - ordered.itemCount() > 0)
+            ordered.addItemHandle(targetItem)
+            ordered.issueImmediateOrder("stop")
