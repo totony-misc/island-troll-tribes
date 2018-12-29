@@ -1,7 +1,7 @@
 
 scope HydraRecipies initializer onInit requires Units
 
-    function ReplaceConditon takes nothing returns boolean
+    function replaceConditon takes nothing returns boolean
         local item array t
         local boolean array b
         local integer i = 0
@@ -42,7 +42,7 @@ scope HydraRecipies initializer onInit requires Units
     private function onInit takes nothing returns nothing
         local trigger t = CreateTrigger()
         call TriggerRegisterUnitEvent( t, OMINOUS_ALTAR, EVENT_UNIT_SELL_ITEM )
-        call TriggerAddCondition( t, Condition(function ReplaceConditon))
+        call TriggerAddCondition( t, Condition(function replaceConditon))
     endfunction
 
 endscope
