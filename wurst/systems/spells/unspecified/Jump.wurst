@@ -1,0 +1,17 @@
+package Jump
+
+
+import ChatCommands
+import ClosureForGroups
+import GameConfig
+import ITTKnockback
+
+init
+    registerCommandAll("jump") (triggerPlayer, args) ->
+        if (gameConfig.isTestModeEnabled())
+            printTimedToPlayer("Added charge to any selected heroes", 5., triggerPlayer)
+            forUnitsSelected(triggerPlayer) u ->
+                if (u.isType(UNIT_TYPE_HERO))
+                    ITTKnockback.add(u, u.getPos().polarOffset(angle(0), 400), 50)
+        else
+            printTimedToPlayer("Requires test mode!", 5., triggerPlayer)

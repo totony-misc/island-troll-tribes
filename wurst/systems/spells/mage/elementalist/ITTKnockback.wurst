@@ -33,7 +33,7 @@ public class ITTKnockback
 	static var frictionCoefficientGround = .0725
 
 	/** In units per second squared. */
-	static var gravity = 90.
+	static var gravity = 9.81
 
 	/**
 	If a unit is not falling faster than this, it will not bounce. Units
@@ -227,5 +227,3 @@ public class ITTKnockback
 
 		if size == 0
 			clock.pause()
-	
-
