@@ -2,6 +2,7 @@ package BushSpawns
 import HashMap
 import ItemPoolExtensions
 import ClosureTimers
+import StackNSplit
 
 let bushes = CreateGroup()
 
@@ -20,7 +21,7 @@ class BushPool
         pool.addItemType(itemId, weight)
 
     function getItem(vec2 pos) returns item
-        return pool.getRandomItem(pos)
+        return pool.placeRandomItem(pos)
 
 function addItemToBush(unit bush)
     let herb = BushPool
@@ -28,7 +29,8 @@ function addItemToBush(unit bush)
     .getItem(bush.getPos())
 
     if herb != null
-        UnitStackItemEx(bush, herb, false)
+        if not bush.isItemFullyStacked(herb.getTypeId())
+            bush.stackItem(herb)
 
 function addItemsToBushes()
     for bush in bushes
@@ -52,8 +54,8 @@ init
     ..addItem(ITEM_NETS, 15)
     ..addItem(ITEM_MANA_CRYSTAL, 15)
     ..addItem(ITEM_SMOKE_BOMB, 15)
-    ..addItem(ITEM_MANA_POTION_IV, 15)
-    ..addItem(ITEM_HEALING_POTION_II, 15)
+    ..addItem(ITEM_MANA_POTION_I, 15)
+    ..addItem(ITEM_HEALING_POTION_I, 15)
     ..addItem(ITEM_BEE_HIVE, 5)
     ..addItem(ITEM_THIEF_MED, 5)
     ..addItem(ITEM_SPIRIT_WATER, 5)
