@@ -4,7 +4,7 @@ dependencies:
 - "https://github.com/wurstscript/wurstStdlib2"
 - "https://github.com/crojewsk/wurstExtLibs.git"
 buildMapData:
-  name: "Island Troll Tribes v3.2 Tournament Edition"
-  fileName: "Island Troll Tribes v3.2 Tournament Edition"
+  name: "Island Troll Tribes v3.2 Tournament Edition 2"
+  fileName: "Island Troll Tribes v3.2 Tournament Edition 2"
   author: "Quazz"
   playerCount: 12
