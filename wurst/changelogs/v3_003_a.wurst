@@ -29,3 +29,4 @@ init
     ..add("Witch doctor hut hp from 325 to 250.")
     ..add("Witch doctor hut visual size reduced by 10%")
     ..add("Removed random chance of not spawning thistles and mushrooms")
+    ..add("Tele gather sorts items by type and doesnt clump them up like it used to")
