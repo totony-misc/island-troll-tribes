@@ -62,9 +62,13 @@ public class TradeShipSupervisor
                 let targetPos = getOrderPos()
                 let nextStopPos = nextStop.getPos()
                 if orderId != Orders.move or targetPos.distanceToSq(nextStopPos) > 10000.0
+                    this.orderListenerEnabled = false
                     ship.issuePointOrder("move", nextStopPos)
+                    this.orderListenerEnabled = true
             case STOPPED
+                this.orderListenerEnabled = false
                 ship.issueImmediateOrder("stop")
+                this.orderListenerEnabled = true
             case EXITED
                 skip
         this.orderListenerEnabled = true
