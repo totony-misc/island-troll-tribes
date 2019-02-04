@@ -35,3 +35,4 @@ init
     ..add("Added oracle potion (recipe: BUTSU BUTSU SPECIAL) that grants true sight for 20 seconds.")
     ..add("Zap charge removal duration from 25 -> 12 seconds, bounces on charge explosion limited to 2.")
     ..add("Item and animal spawns re-coded. Pseudorandomization added for item spawning to even out the RNG.")
+    ..add("Added cloak of mana to witch doctors hut.")
