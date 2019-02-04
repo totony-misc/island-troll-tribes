@@ -4,7 +4,7 @@ dependencies:
 - "https://github.com/wurstscript/wurstStdlib2"
 - "https://github.com/crojewsk/wurstExtLibs.git"
 buildMapData:
-  name: "Island Troll Tribes v3.3a SMOKETEST"
-  fileName: "Island Troll Tribes v3.3a SMOKETEST"
+  name: "Island Troll Tribes v3.3a SMOKETEST2"
+  fileName: "Island Troll Tribes v3.3a SMOKETEST2"
   author: "Quazz, Marsunpaisti, Xan Kriegor"
   playerCount: 12
