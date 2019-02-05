@@ -37,3 +37,5 @@ init
     ..add("Item and animal spawns re-coded. Pseudorandomization added for item spawning to even out the RNG")
     ..add("Added cloak of mana to witch doctors hut")
     ..add("Trade boat sells iron ingot instead of sonar compass")
+    ..add("Scroll of cyclone allows for walking through the cycloned unit")
+    ..add("Dark spears changed to always burn 50 mana over 3 seconds")
