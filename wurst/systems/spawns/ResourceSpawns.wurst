@@ -21,7 +21,6 @@ import GreenFish
 import Fish
 import Lodash
 import UnitEntity
-import ChatCommands
 
 let itemSpawnInfoMap = new IterableMap<int, SpawnInfo>()
 let animalSpawnInfoMap = new IterableMap<int, SpawnInfo>()
@@ -67,7 +66,7 @@ class IslandSpawner
     int itemsSpawnCount
     int animalsSpawnCount
     private int itemsSpawnedTotal = 0
-    Pool<int> itemPool = null
+    private Pool<int> itemPool = null
 
     construct(int itemsSpawnCount, int animalsSpawnCount, Pool<rect> spawnRegionsPool)
         this.itemsSpawnCount = itemsSpawnCount
@@ -153,29 +152,6 @@ class IslandSpawner
 
             this.itemPool.add((itemWeight * adjustmentRatio).round(), spawnInfo.id)
 
-            var debugtext = ""
-            switch spawnInfo.id
-                case ITEM_STONE
-                    debugtext += "Stone"
-                case ITEM_MANA_CRYSTAL
-                    debugtext += "Manacrystal"
-                case ITEM_FLINT
-                    debugtext += "Flint"
-                case ITEM_TINDER
-                    debugtext += "Tinder"
-                case ITEM_STICK
-                    debugtext += "Stick"
-                case ITEM_CLAY_BALL
-                    debugtext += "Clay"
-                case ITEM_MUSHROOM
-                    debugtext += "Mushroom"
-                case ITEM_MAGIC
-                    debugtext += "Magic"
-
-            debugtext += " | Added with weight: " + (itemWeight * adjustmentRatio).round().toString() + "Adjustment: " + adjustmentRatio.toString(2) + " itemWeight: " + itemWeight.toString()
-            printTimed(debugtext, 5)
-
-
             //Update desired item counts for next spawning round
             //Basically keeping count of the sum that the total items of that type should be at on average at the end of this spawn cycle
             let weightRatio = itemWeight / totalWeight
@@ -218,8 +194,6 @@ public function handleItemSpawning()
 
         //Return when all islandSpawners iterated without any spawns (or abrupt stop condition reached)
         if not loopDidSpawn
-            for island in spawnedCount
-                printTimed(spawnedCount.get(island).toString() + " spawns", 4)
             destroy spawnedCount
             destroy itemLoop //Break
 
@@ -369,35 +343,3 @@ init
         doAfter(25, -> spawnFishAndHawks())
         doAfter(30, -> addItemsToBushes())
         startSpawnCycle()
-
-    registerCommandAll("globs") (triggerPlayer, args) ->
-        print("Item base: " + udg_ITEM_BASE.toString())
-        print("Food base: " + udg_FOOD_BASE.toString())
-        print("Item current / max: " + udg_ITEM_CURRENT.toString() + " / " + udg_ITEM_MAX.toString())
-
-    registerCommandAll("debugspawns") (triggerPlayer, args) ->
-        if args.size() > 1
-            let island = islandSpawnList.get(args.get(1).toInt())
-            let islandpool = island.itemPool
-            for id in islandpool.options
-                var debugtext = ""
-                switch id
-                    case ITEM_STONE
-                        debugtext += "Stone"
-                    case ITEM_MANA_CRYSTAL
-                        debugtext += "Manacrystal"
-                    case ITEM_FLINT
-                        debugtext += "Flint"
-                    case ITEM_TINDER
-                        debugtext += "Tinder"
-                    case ITEM_STICK
-                        debugtext += "Stick"
-                    case ITEM_CLAY_BALL
-                        debugtext += "Clay"
-                    case ITEM_MUSHROOM
-                        debugtext += "Mushroom"
-                    case ITEM_MAGIC
-                        debugtext += "Magic"
-
-                debugtext += " | Spawned: " + island.spawnsPerType.get(id).toString() + " / " + island.desiredSpawnsPerType.get(id).toString()
-                printTimed(debugtext, 3)
