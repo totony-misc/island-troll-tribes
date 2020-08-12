@@ -7,7 +7,7 @@ import OrderIds
 import ClosureEvents
 import ClosureTimers
 
-let ORDER_ID = Orders.blizzard.toString()
+//let ORDER_ID = Orders.blizzard.toString()
 let COOL_DOWN = 30.
 let MANA_COST = 15
 let BUSH_DURATION = 30.
@@ -16,16 +16,16 @@ let BUSH_DURATION = 30.
 
 @compiletime function createBreathOfLife() returns ChannelAbilityPreset
     return new ChannelAbilityPreset(ABILITY_BREATH_OF_LIFE, 1, true)
-    ..setDummyAbility()
-    ..presetBaseOrderID(lvl -> ORDER_ID)
-    ..setManaCost(1, MANA_COST)
-    ..setCooldown(1, COOL_DOWN)
-    ..presetTargetTypes(Targettype.POINT)
+    //..setDummyAbility()
+    //..presetBaseOrderID(lvl -> ORDER_ID)
+    //..setManaCost(1, MANA_COST)
+    //..setCooldown(1, COOL_DOWN)
+    //..presetTargetTypes(Targettype.POINT)
 
 function plantBush(vec2 target)
-    let fakeBush = createDestructable('B000', target, angle(0), 1, 0)
-    doAfter(BUSH_DURATION) -> 
-        fakeBush.kill()
+    //let fakeBush = createDestructable('B000', target, angle(0), 1, 0)
+    //doAfter(BUSH_DURATION) -> 
+    //    fakeBush.kill()
 
 
 init
