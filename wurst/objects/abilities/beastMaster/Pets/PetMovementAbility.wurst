@@ -1,6 +1,5 @@
 package PetMovementAbility
 
-
 // Standard Library Imports:
 import ChannelAbilityPreset
 import ClosureEvents
@@ -23,13 +22,12 @@ let STR_MANUAL = "Manual".color(COLOR_YELLOW)
 let NAME     = "Toggle Pet Control"
 let TOOLTIP  = "Toggle pet control."
 let TOOLTIP_EXT = "Toggle between " + STR_MANUAL + " and " + STR_AUTOMATIC + " pet controls.\n\n" +
-                    STR_MANUAL + " : In manual mode press \"CTRL + R\" to order your pet to move/attack target location.\n\n" +
+                    STR_MANUAL + " : Normal Warcraft 3 mechanics.\n\n" +
                     STR_AUTOMATIC + " : In automatic mode the pet will copy actions taken by the owner."
 let ORDER_ID = "barkskinoff"
 
 let AUTO_CONTROL_MESSAGE = "Auto pet control."
 let MANUAL_CONTROL_MESSAGE = "Manual pet control."
-
 
 function createTogglePetControlSpell(int newAbilId) returns ChannelAbilityPreset
     return new ChannelAbilityPreset(newAbilId, 1, true)
@@ -88,5 +86,4 @@ init
     EventListener.onCast(ABILITY_TOGGLE_PET_CONTROL_SHAPESHIFTER, _ -> togglePetControl())
 
     registerGameStartEvent() ->
-        nullTimer() ->
-            initializeControls()
+        initializeControls()
