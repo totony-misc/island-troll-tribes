@@ -1,0 +1,121 @@
+package NewQuickMake
+
+import LinkedList
+import HashMap
+import ChannelAbilityPreset
+import UnitExtensions
+import LocalObjectIDs
+import Lodash
+
+import NewCraft
+
+import ToolTipsUtils
+
+import ClosureEvents
+import ClosuresForItems
+
+constant COOLDOWN = 1.
+
+let quickmakes = compiletime(new IterableMap<int,Pair<int,LinkedList<LinkedList<int>>>>())
+
+function makeQuickMakeTooltipNormalExtended(string name) returns string
+    return "Quickmake for " + name
+
+function makeQuickMakeTooltipNormalExtended(string hotkey, string name) returns string
+    return "Quickmake for " + name + "(" + hotkey + ")"
+
+class QuickMakeTooltip implements TooltipGenerator
+    StringLevelClosure name = null
+    StringLevelClosure hotkey = null
+
+    override function addProperty(string name, StringLevelClosure lc)
+        if name == "Name"
+            this.name = lc
+        else if name == "Hotkey"
+            this.hotkey = lc
+
+    override function applyToDef(AbilityDefinition def)
+        def.presetTooltipNormal() lvl ->
+            return this.hotkey != null ? makeToolTipNorm(this.name.run(lvl)) : makeToolTipNorm(this.hotkey.run(lvl), this.name.run(lvl))
+
+        def.presetTooltipNormalExtended() lvl ->
+            return this.hotkey != null ? makeQuickMakeTooltipNormalExtended(this.name.run(lvl)) : makeQuickMakeTooltipNormalExtended(this.hotkey.run(lvl), this.name.run(lvl))
+
+public function createQuickMake(int itemId, LinkedList<int> components) returns AbilityDefinition
+    let ll = new LinkedList<LinkedList<int>>()
+        ..add(components)
+    return createQuickMake(itemId, ll)
+
+public function createQuickMake(int itemId, LinkedList<LinkedList<int>> possibleComponents) returns AbilityDefinition
+    let id = ABIL_ID_GEN.next()
+    quickmakes.put(id, new Pair(itemId, possibleComponents))
+    let tgen = new QuickMakeTooltip()
+    return new ChannelAbilityPreset(id, 1, true, tgen)
+        ..setCooldown(1, COOLDOWN)
+        ..presetTargetTypes(Targettype.NONE)
+        ..setHeroAbility(false)
+
+function getQuickmakeRange(unit u) returns int
+    if u.isTroll()
+        return 100
+    else if u.getTypeId() == UNIT_CRAFT_MASTER
+        return 300
+    else
+        return 700
+
+function doQuickmake(unit caster, LinkedList<int> combination) returns LinkedList<item>
+    let foundItems = new LinkedList<item>()
+    for currentItem in combination
+        print("Searching item " + currentItem.toString())
+        var found = caster.getItemById(currentItem)
+        if found == null
+            found = findNearestItem(caster.getPos(), getQuickmakeRange(caster).toReal(), i -> i.getTypeId() == currentItem)
+        if found == null
+            print("Not found")
+            break
+        else
+            found.setVisible(false)
+            foundItems.add(found)
+
+    foundItems.forEach() (item t) ->
+        t.setVisible(true)
+
+    return foundItems
+
+function doQuickmake(unit caster, LinkedList<LinkedList<int>> combinations) returns LinkedList<item>
+    for combination in combinations
+        let items = doQuickmake(caster, combination)
+        if items != null
+            return items
+
+    return null
+
+public function dg()
+    quickmakes.forEach() (integer key, Pair<integer, LinkedList<LinkedList<integer>>> value) ->
+        print(key)
+
+function quickmake(unit caster, int abilId) returns item
+    print(abilId)
+    dg()
+    let def = quickmakes.get(abilId)
+    print("after")
+    if def == null
+        print("is null")
+        return null
+
+    print("Doing quickmake")
+    let combinations = def.b
+
+    let items = doQuickmake(caster, combinations)
+    if items == null
+        return null
+
+    let itemId = def.a
+    return craftForUnit(caster, itemId, items)
+
+init
+    EventListener.add(EVENT_PLAYER_UNIT_SPELL_CAST) ->
+        let abilId = EventData.getSpellAbilityId()
+        let caster = EventData.getSpellAbilityUnit()
+
+        quickmake(caster, abilId)

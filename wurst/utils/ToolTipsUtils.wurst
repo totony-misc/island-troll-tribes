@@ -23,6 +23,9 @@ public function makeToolTipNormHero(string hotkey, string tooltip, int level) re
         ("] - " + tooltip + " - Level " + level.toString()).color(GENERAL_COLOR)
     ).join()
 
+public function makeToolTipNorm(string tooltip) returns string
+    return tooltip.color(GENERAL_COLOR)
+
 public function makeToolTipNorm(string hotkey, string tooltip) returns string
     return asList(
         "[".color(GENERAL_COLOR),

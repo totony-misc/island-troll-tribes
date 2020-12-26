@@ -400,6 +400,9 @@ function spawnFishAndHawks()
         spawnFishOrHawk(gg_rct_fish_new_7)
         spawnFishOrHawk(gg_rct_fish_new_8)
 
+public function itemCounted(item i) returns boolean
+    return itemSpawnInfoMap.has(i.getTypeId())
+
 bool array debug_status
 
 init

@@ -3,6 +3,17 @@ package Forge
 // Local imports:
 import Building
 import LocalObjectIDs
+import NewQuickMake
+import LinkedList
+import LocalAssets
+
+let TEST_QM = compiletime(createQuickMake(ITEM_IRON_INGOT, new LinkedList<int>..add(ITEM_FLINT)..add(ITEM_STONE))
+    ..tooltipStartListen()
+    ..setName("Iron Ingot")
+    ..presetHotkey("I")
+    ..setIconNormal(LocalIcons.bTNWolfHideCoat)
+    ..tooltipStopListen()
+    .getNewId())
 
 public class Forge extends Building
     private static let unitTypeId = UNIT_FORGE
@@ -16,17 +27,8 @@ public class Forge extends Building
     override function postCreate()
         super.postCreate()
 
-        getUnit().addAbility(ABILITY_QM_IRON_INGOT)
-        getUnit().addAbility(ABILITY_QM_STEEL_INGOT)
-        getUnit().addAbility(ABILITY_QM_IRON_AXE)
-        getUnit().addAbility(ABILITY_QM_STEEL_AXE)
-        getUnit().addAbility(ABILITY_ARMOR_SPELLBOOK_ID)
-        getUnit().addAbility(ABILITY_QM_SPEAR)
-        getUnit().addAbility(ABILITY_QM_IRON_SPEAR)
-        getUnit().addAbility(ABILITY_QM_STEEL_SPEAR)
-        getUnit().addAbility(ABILITY_QM_DARK_SPEAR)
-        getUnit().addAbility(ABILITY_QM_MAGE_MASHER)
-        getUnit().addAbility(ABILITY_FORGE_SPELLBOOK_ID)
+        getUnit().addAbility(TEST_QM)
 
 init
     Forge.initialize()
+    print(TEST_QM)

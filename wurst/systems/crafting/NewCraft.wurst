@@ -1,0 +1,23 @@
+package NewCraft
+
+import LinkedList
+import ResourceSpawns
+
+// Craft an item with the provided item list
+public function craft(int itemId, LinkedList<item> items) returns item
+    for i in items
+        i.remove()
+        if itemCounted(i)
+            lowerItem(1)
+
+    return createItem(itemId, vec2(0,0))
+
+public function craftForUnit(unit u, int itemId, LinkedList<item> items) returns item
+    let i = craft(itemId, items)
+
+    if u.isInventoryFull()
+        u.removeItemFromSlot(u.inventorySize())
+
+    u.addItemHandle(i)
+
+    return i
